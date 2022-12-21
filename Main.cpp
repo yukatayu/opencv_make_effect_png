@@ -102,6 +102,7 @@ void render(cv::Mat& img, const Status status){
 	const int   height   = status.height;
 	const int   width    = status.width;
 
+	// ここから下がメインの色の指定処理
 	for(int y=0; y<img.size().height; ++y){
 		for(int x=0; x<img.size().width; ++x){
 			cv::Vec4b col(
