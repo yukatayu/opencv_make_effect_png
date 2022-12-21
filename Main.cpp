@@ -5,9 +5,9 @@
 #include <sstream>
 #include <opencv2/opencv.hpp>
 
-std::string zero_ume(int i){
+std::string zero_ume(int i, int width = 6){
 	std::ostringstream ss;
-	ss << std::setfill('0') << std::right << std::setw(6) << i;
+	ss << std::setfill('0') << std::right << std::setw(width) << i;
 	return ss.str();
 }
 
@@ -22,7 +22,7 @@ int main(){
 		}
 	}
 	std::ostringstream file_name;
-	file_name << "out_" << zero_ume(0) << ".png";
+	file_name << "png/out_" << zero_ume(0) << ".png";
 	cv::imwrite(file_name.str(), img);
 	std::cout << file_name.str() << std::endl;
 }
