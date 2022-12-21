@@ -12,7 +12,7 @@ popd
 
 mkdir -p png
 rm -f png/*.png
-build/main 30 1920 1080  # 30 fps, 1920x1080 px
+time build/main 30 1920 1080  # 30 fps, 1920x1080 px
 # build/main 30 480 256  # 30 fps, 480x256 px
 
 rm -f out.mov

@@ -48,7 +48,7 @@ struct Status {
 	int frame;
 	float fps;
 	float time;
-	int duration;
+	float duration;
 	int height;
 	int width;
 };
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]){
 				std::ostringstream file_name;
 				file_name << "png/out_" << zero_ume(frame) << ".png";
 				cv::imwrite(file_name.str(), img);
-				
+
 				progress_bar(done_frame_cnt++, total_frame_cnt);
 			});
 		}

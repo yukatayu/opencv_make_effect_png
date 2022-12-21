@@ -19,8 +19,7 @@ void init(Status& status){
 	*/
 
 	status.duration = 1;
-	return ;
-
+	// return ;  // デバッグ用
 	
 	const int vert_cnt = 9;  // 縦に並べる個数
 	const float vert_unit = status.height / vert_cnt;  // 正方形の大きさ
@@ -66,7 +65,7 @@ inline void render(cv::Mat& img, const Status status){
 	const int   frame    = status.frame;
 	const float time     = status.time;
 	const float fps      = status.fps;
-	const int   duration = status.duration;
+	const float duration = status.duration;
 	const int   height   = status.height;
 	const int   width    = status.width;
 	// -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+- //
@@ -87,10 +86,13 @@ inline void render(cv::Mat& img, const Status status){
 			for(int sy = 0; sy < vert_cnt; ++sy){
 				for(int sx = 0; sx < hori_cnt; ++sx){  //縦横に正方形を並べる
 					const int sid = sy + sx;
+					const float anim_time_phase[2] {
+						saturate((time - time_delta*sid) / time_in),
+						saturate((time - time_start_rev - time_delta*sid) / time_in)
+					};
 					const float anim_time =  // 0～1の間でアニメーションする
-						std::min(
-							saturate((time - time_delta*sid) / time_in),
-							saturate(1 - (time - time_start_rev - time_delta*sid) / time_in));
+						std::min(anim_time_phase[0], 1 - anim_time_phase[1]);
+					// const float anim_time_for_rot = 0 < anim_time_phase[1] ? anim_time_phase[1] : anim_time_phase[0];
 					if(anim_time == 0)
 						continue;  // この正方形は，まだ出現していない
 					
@@ -114,7 +116,7 @@ inline void render(cv::Mat& img, const Status status){
 						auto[cx, cy] = *maybe_square;  // 四角形の中での今の位置の座標 [-1,1]
 						
 						// 透明度を良い感じにする
-						float opacity = pow(std::max(std::abs(cx), std::abs(cy)), 0.2);  // 端に行くにつれて1に近づく(minなので四角っぽくなるはず)
+						float opacity = pow(std::max(std::abs(cx), std::abs(cy)), 2);  // 端に行くにつれて1に近づく(minなので四角っぽくなるはず)
 						opacity = 1 - opacity * (1-anim_time);  // 出現しきった時には不透明
 						opacity *= 1 - (1-anim_time);  // だんだんと不透明になりながら出現
 						opacity = saturate(opacity);
