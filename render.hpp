@@ -116,8 +116,8 @@ inline void render(cv::Mat& img, const Status status){
 						auto[cx, cy] = *maybe_square;  // 四角形の中での今の位置の座標 [-1,1]
 						
 						// 透明度を良い感じにする
-						float opacity = pow(std::max(std::abs(cx), std::abs(cy)), 2);  // 端に行くにつれて1に近づく(minなので四角っぽくなるはず)
-						opacity = 1 - opacity * (1-anim_time);  // 出現しきった時には不透明
+						float opacity = pow(std::max(std::abs(cx), std::abs(cy)), 0.4);  // 端に行くにつれて1に近づく(minなので四角っぽくなるはず)
+						opacity = 1 - opacity * saturate(2*(1-anim_time));  // 出現しきった時には不透明
 						opacity *= 1 - (1-anim_time);  // だんだんと不透明になりながら出現
 						opacity = saturate(opacity);
 
