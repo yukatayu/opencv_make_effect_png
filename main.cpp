@@ -5,10 +5,14 @@
 #include <sstream>
 #include <utility>
 #include <cmath>
+#include <thread>
+#include <vector>
+#include <atomic>
 #include <opencv2/opencv.hpp>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+#include "Blend.hpp"
 
 // -+-+-+-+-+-+-+-+-+-+- //
 //        Utility        //
@@ -24,14 +28,15 @@ void progress_bar(long long int numerator, long long int denominator){
 	struct winsize winsz;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &winsz);
 	++numerator;
-	std::cerr << "\e[2K\r |";
+	std::ostringstream ss;
+	ss << "\e[2K\r |";
 	int max = winsz.ws_col - 20 - 2*std::log10(denominator);
 	for(int i=0; i<max; ++i)
-		std::cerr << (numerator* max >= i * denominator ? "\e[42m" : "\e[41m") << " ";
-	std::cerr << "\e[0m| "
+		ss << (numerator* max >= i * denominator ? "\e[42m" : "\e[41m") << " ";
+	ss << "\e[0m| "
 		<< numerator << " / " << denominator
-		<< " (" << int(double(numerator*100) / denominator) << '%' << ")"
-		<< std::flush;
+		<< " (" << int(double(numerator*100) / denominator) << '%' << ")";
+	std::cerr << ss.str() << std::flush;
 };
 
 
@@ -48,8 +53,10 @@ struct Status {
 	int width;
 };
 
+namespace renderer {
 void init(Status& status);
 void render(cv::Mat& img, const Status status);
+}
 
 int main(int argc, char *argv[]){
 	const float fps_      = (argc > 1 ? std::stof(argv[1]) :   30);  // デフォルト: 30 fps
@@ -57,25 +64,40 @@ int main(int argc, char *argv[]){
 	const int   height_   = (argc > 3 ? std::stoi(argv[3]) : 1080);  // デフォルト: 1080 px
 
 	Status status{ 0, fps_, 0, 0, height_, width_ };
-	init(status);
+	renderer::init(status);
 
-	std::cout << "fps: "      << status.fps      << std::endl;
-	std::cout << "duration: " << status.duration << std::endl;
-	std::cout << "width: "    << status.width    << std::endl;
-	std::cout << "height: "   << status.height   << std::endl;
+	std::cout << "fps: "       << status.fps      << std::endl;
+	std::cout << "duration: "  << status.duration << std::endl;
+	std::cout << "width: "     << status.width    << std::endl;
+	std::cout << "height: "    << status.height   << std::endl;
+	std::cout << "max thread:" <<  MAX_THREAD << std::endl;
 
-	for(int frame = 0; frame < status.fps * status.duration; ++frame){
-		progress_bar(frame, status.fps * status.duration);
-		float time = float(frame) / status.fps;
-		cv::Mat img = cv::Mat::zeros(cv::Size(status.width, status.height), CV_MAKE_TYPE(CV_8U, 4));
+	std::atomic_int done_frame_cnt{0};
+	int total_frame_cnt = status.fps * status.duration;
+	// 数回に分けて，スレッドの塊を立ち上げていく
+	for(int thread_phase = 0; thread_phase*MAX_THREAD < total_frame_cnt; ++thread_phase){
+		std::vector<std::thread> threads;
+		// スレッドを立ち上げていく
+		for(int frame = thread_phase*MAX_THREAD; frame < (thread_phase+1)*MAX_THREAD && frame < total_frame_cnt; ++frame){
+			threads.emplace_back([=, &done_frame_cnt]{
+				float time = float(frame) / status.fps;
+				cv::Mat img = cv::Mat::zeros(cv::Size(status.width, status.height), CV_MAKE_TYPE(CV_8U, 4));
 
-		status.frame = frame;
-		status.time  = time;
-		render(img, status);
+				Status current_status = status;
+				current_status.frame = frame;
+				current_status.time  = time;
+				renderer::render(img, current_status);
 
-		std::ostringstream file_name;
-		file_name << "png/out_" << zero_ume(frame) << ".png";
-		cv::imwrite(file_name.str(), img);
+				std::ostringstream file_name;
+				file_name << "png/out_" << zero_ume(frame) << ".png";
+				cv::imwrite(file_name.str(), img);
+				
+				progress_bar(done_frame_cnt++, total_frame_cnt);
+			});
+		}
+		// スレッドの塊を待つ
+		for(auto& th : threads)
+			th.join();
 	}
 	std::cerr << std::endl;
 }
