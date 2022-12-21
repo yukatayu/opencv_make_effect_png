@@ -51,16 +51,16 @@ void render(cv::Mat& img, const Status status);
 
 int main(int argc, char *argv[]){
 	const float fps      = (argc > 1 ? std::stof(argv[1]) :   30);  // デフォルト: 30 fps
-	const int   duration = (argc > 2 ? std::stoi(argv[2]) :    2);  // デフォルト: 2 sec
-	const int   width    = (argc > 3 ? std::stoi(argv[3]) : 1920);  // デフォルト: 1920 px
-	const int   height   = (argc > 4 ? std::stoi(argv[4]) : 1080);  // デフォルト: 1080 px
-	std::cout << "fps: "      << fps      << std::endl;
-	std::cout << "duration: " << duration << std::endl;
-	std::cout << "width: "    << width    << std::endl;
-	std::cout << "height: "   << height   << std::endl;
+	const int   width    = (argc > 2 ? std::stoi(argv[3]) : 1920);  // デフォルト: 1920 px
+	const int   height   = (argc > 3 ? std::stoi(argv[4]) : 1080);  // デフォルト: 1080 px
 
-	Status status{ 0, fps, 0, duration, height, width };
+	Status status{ 0, fps, 0, 0, height, width };
 	init(status);
+
+	std::cout << "fps: "      << status.fps      << std::endl;
+	std::cout << "duration: " << status.duration << std::endl;
+	std::cout << "width: "    << status.width    << std::endl;
+	std::cout << "height: "   << status.height   << std::endl;
 
 	for(int frame = 0; frame < fps * duration; ++frame){
 		progress_bar(frame, fps*duration);
@@ -82,37 +82,4 @@ int main(int argc, char *argv[]){
 //       Main Area       //
 // -+-+-+-+-+-+-+-+-+-+- //
 
-void init(Status& status){
-	/**
-	以下の値を適宜書き換えられる。
-	主に duration の設定用。
-
-	const float status.fps;
-	const int   status.duration;
-	const int   status.height;
-	const int   status.width;
-	*/
-}
-
-void render(cv::Mat& img, const Status status){
-	const int   frame    = status.frame;
-	const float time     = status.time;
-	const float fps      = status.fps;
-	const int   duration = status.duration;
-	const int   height   = status.height;
-	const int   width    = status.width;
-
-	// ここから下がメインの色の指定処理
-	for(int y=0; y<img.size().height; ++y){
-		for(int x=0; x<img.size().width; ++x){
-			cv::Vec4b col(
-				x%256,                    // r
-				(x+y)%256,                // g
-				int(status.time*128)%256, // b
-				int(y+time*256)%256       // a
-			);
-			img.at<cv::Vec4b>(y,x) = col;
-		}
-	}
-
-}
+#include "render.hpp"
