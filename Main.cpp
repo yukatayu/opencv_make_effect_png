@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <sstream>
 #include <utility>
+#include <cmath>
 #include <opencv2/opencv.hpp>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -19,14 +20,13 @@ std::string zero_ume(int i, int width = 6){
 }
 
 void progress_bar(long long int numerator, long long int denominator){
-//進捗の表示
 	struct winsize winsz;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &winsz);
 	++numerator;
 	std::cerr << "\e[2K\r |";
 	int max = winsz.ws_col - 20 - 2*std::log10(denominator);
 	for(int i=0; i<max; ++i)
-	std::cerr << (numerator* max >= i * denominator ? "\e[42m" : "\e[41m") << " ";
+		std::cerr << (numerator* max >= i * denominator ? "\e[42m" : "\e[41m") << " ";
 	std::cerr << "\e[0m| "
 		<< numerator << " / " << denominator
 		<< " (" << int(double(numerator*100) / denominator) << '%' << ")"
