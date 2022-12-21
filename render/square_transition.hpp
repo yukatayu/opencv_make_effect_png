@@ -2,6 +2,7 @@
 #include <array>
 #include <optional>
 #include <complex>
+#include <cmath>
 
 namespace renderer {
 
@@ -116,7 +117,8 @@ inline void render(cv::Mat& img, const Status status){
 						auto[cx, cy] = *maybe_square;  // 四角形の中での今の位置の座標 [-1,1]
 						
 						// 透明度を良い感じにする
-						float opacity = pow(std::max(std::abs(cx), std::abs(cy)), 0.4);  // 端に行くにつれて1に近づく(minなので四角っぽくなるはず)
+						// float opacity = std::pow(std::max(std::abs(cx), std::abs(cy)), 0.4);  // 端に行くにつれて1に近づく(minなので四角っぽくなるはず)
+						float opacity = std::pow(cx*cx+cy*cy, 0.3);  // 端に行くにつれて1に近づく(丸っぽくする)
 						opacity = 1 - opacity * saturate(2*(1-anim_time));  // 出現しきった時には不透明
 						opacity *= 1 - (1-anim_time);  // だんだんと不透明になりながら出現
 						opacity = saturate(opacity);
@@ -125,11 +127,11 @@ inline void render(cv::Mat& img, const Status status){
 						std::array<float,2> vec_diagonal{ float(width), float(height) }, pos{ float(x), float(y) };
 						float gradation = dot(vec_diagonal, pos) / dot(vec_diagonal, vec_diagonal);
 
-						// 色はここの数値： https://www.colordic.org/colorsample/7049
+						// 注意： 色はBGRAの順に格納される。
 						col = blend_screen(col, cv::Vec4b(
-							lerp(255, 162, gradation),
-							lerp(147, 143, gradation),
-							lerp(201, 255, gradation),
+							lerp( 84, 133, gradation),
+							lerp( 62, 229, gradation),
+							lerp(221, 107, gradation),
 							opacity * 255));
 					}
 				}
