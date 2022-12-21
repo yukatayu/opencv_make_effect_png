@@ -67,7 +67,7 @@ int main(int argc, char *argv[]){
 	for(int frame = 0; frame < status.fps * status.duration; ++frame){
 		progress_bar(frame, status.fps * status.duration);
 		float time = float(frame) / status.fps;
-		cv::Mat img(cv::Size(status.width, status.height), CV_MAKE_TYPE(CV_8U, 4));
+		cv::Mat img = cv::Mat::zeros(cv::Size(status.width, status.height), CV_MAKE_TYPE(CV_8U, 4));
 
 		status.frame = frame;
 		status.time  = time;

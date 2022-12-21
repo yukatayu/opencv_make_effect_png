@@ -121,6 +121,28 @@ inline void blend_xor(cv::Vec4b& dst, const cv::Vec4b src){
 //       Rendering       //
 // -+-+-+-+-+-+-+-+-+-+- //
 
+// 四角形の描画 (rot = 0～1)
+// 返り値： x,yの順， [-1,1] の範囲 or nullopt
+inline std::optional<std::array<float,2>> rectangle(float dx, float dy, float width, float height, float rot = 0){
+	// 回転する： (x+yi) * e^{2πi * rot}
+	auto xy = std::complex<double>(dx, dy) * std::exp(std::complex<double>(0, rot*2*M_PI));
+	std::array<float,2> res{ float(xy.real() / width), float(xy.imag() / height) };
+	if(std::abs(res[0]) <= 1 && std::abs(res[1]) <= 1)
+		return res;
+	else
+		return std::nullopt;
+
+}
+
+// 円の描画
+// 返り値： [0,1] の範囲 or nullopt
+inline std::optional<float> circle(float dx, float dy, float radius){
+	float res = dx*dx + dy*dy / radius*radius;
+	if(res <= 1)
+		return res;
+	else
+		std::nullopt;
+}
 
 inline void render(cv::Mat& img, const Status status){
 	const int   frame    = status.frame;
