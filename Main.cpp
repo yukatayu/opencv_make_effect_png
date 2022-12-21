@@ -104,7 +104,12 @@ void render(cv::Mat& img, const Status status){
 
 	for(int y=0; y<img.size().height; ++y){
 		for(int x=0; x<img.size().width; ++x){
-			cv::Vec4b col(x%256, (x+y)%256, int(status.time*128)%256, int(y+time*256)%256);
+			cv::Vec4b col(
+				x%256,                    // r
+				(x+y)%256,                // g
+				int(status.time*128)%256, // b
+				int(y+time*256)%256       // a
+			);
 			img.at<cv::Vec4b>(y,x) = col;
 		}
 	}
