@@ -9,6 +9,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+
 // -+-+-+-+-+-+-+-+-+-+- //
 //        Utility        //
 // -+-+-+-+-+-+-+-+-+-+- //
@@ -33,6 +34,7 @@ void progress_bar(long long int numerator, long long int denominator){
 		<< std::flush;
 };
 
+
 // -+-+-+-+-+-+-+-+-+-+- //
 //       Main Loop       //
 // -+-+-+-+-+-+-+-+-+-+- //
@@ -50,11 +52,11 @@ void init(Status& status);
 void render(cv::Mat& img, const Status status);
 
 int main(int argc, char *argv[]){
-	const float fps      = (argc > 1 ? std::stof(argv[1]) :   30);  // デフォルト: 30 fps
-	const int   width    = (argc > 2 ? std::stoi(argv[3]) : 1920);  // デフォルト: 1920 px
-	const int   height   = (argc > 3 ? std::stoi(argv[4]) : 1080);  // デフォルト: 1080 px
+	const float fps_      = (argc > 1 ? std::stof(argv[1]) :   30);  // デフォルト: 30 fps
+	const int   width_    = (argc > 2 ? std::stoi(argv[2]) : 1920);  // デフォルト: 1920 px
+	const int   height_   = (argc > 3 ? std::stoi(argv[3]) : 1080);  // デフォルト: 1080 px
 
-	Status status{ 0, fps, 0, 0, height, width };
+	Status status{ 0, fps_, 0, 0, height_, width_ };
 	init(status);
 
 	std::cout << "fps: "      << status.fps      << std::endl;
@@ -62,10 +64,10 @@ int main(int argc, char *argv[]){
 	std::cout << "width: "    << status.width    << std::endl;
 	std::cout << "height: "   << status.height   << std::endl;
 
-	for(int frame = 0; frame < fps * duration; ++frame){
-		progress_bar(frame, fps*duration);
-		float time = float(frame) / fps;
-		cv::Mat img(cv::Size(width, height), CV_MAKE_TYPE(CV_8U, 4));
+	for(int frame = 0; frame < status.fps * status.duration; ++frame){
+		progress_bar(frame, status.fps * status.duration);
+		float time = float(frame) / status.fps;
+		cv::Mat img(cv::Size(status.width, status.height), CV_MAKE_TYPE(CV_8U, 4));
 
 		status.frame = frame;
 		status.time  = time;
@@ -78,8 +80,9 @@ int main(int argc, char *argv[]){
 	std::cerr << std::endl;
 }
 
+
 // -+-+-+-+-+-+-+-+-+-+- //
-//       Main Area       //
+//        Include        //
 // -+-+-+-+-+-+-+-+-+-+- //
 
 #include "render.hpp"
