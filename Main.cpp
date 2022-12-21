@@ -14,15 +14,19 @@ std::string zero_ume(int i, int width = 6){
 int main(){
 	// メモ： 読み込みは
 	// cv::Mat transimg = cv::imread("transparent.png",cv::IMREAD_UNCHANGED);
-	cv::Mat img(cv::Size(1920, 1080), CV_MAKE_TYPE(CV_8U, 4));
-	for(int y=0; y<img.size().height; ++y){
-		for(int x=0; x<img.size().width; ++x){
-			cv::Vec4b col(x%256, (x+y)%256, 0, y%256);
-			img.at<cv::Vec4b>(y,x) = col;
+
+	for(int frame = 0; frame < 30; ++frame){
+		cv::Mat img(cv::Size(1920, 1080), CV_MAKE_TYPE(CV_8U, 4));
+		
+		for(int y=0; y<img.size().height; ++y){
+			for(int x=0; x<img.size().width; ++x){
+				cv::Vec4b col(x%256, (x+y)%256, 0, (y+frame)%256);
+				img.at<cv::Vec4b>(y,x) = col;
+			}
 		}
+
+		std::ostringstream file_name;
+		file_name << "png/out_" << zero_ume(frame) << ".png";
+		cv::imwrite(file_name.str(), img);
 	}
-	std::ostringstream file_name;
-	file_name << "png/out_" << zero_ume(0) << ".png";
-	cv::imwrite(file_name.str(), img);
-	std::cout << file_name.str() << std::endl;
 }

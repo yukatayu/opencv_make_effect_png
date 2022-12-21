@@ -16,4 +16,5 @@ mkdir -p png
 rm -f png/*.png
 build/main
 
-ffmpeg -framerate 30 -i png/out_%06d.png -pix_fmt argb -c:v qtrle -r 30 out.mp4
+ffmpeg -framerate 30 -i png/out_%06d.png -pix_fmt argb -c:v qtrle -r 30 out.mov
+# ffmpeg -framerate 30 -i png/out_%06d.png -c:v qtrle -r 30 out.mov

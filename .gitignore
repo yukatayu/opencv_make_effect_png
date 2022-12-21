@@ -33,3 +33,8 @@
 
 # etc
 build/
+png/
+
+*.mov
+*.mp4
+*.webm

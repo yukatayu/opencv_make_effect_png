@@ -6,4 +6,5 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_executable(main Main.cpp)
+target_compile_options(main PUBLIC -O2)
 target_link_libraries(main ${OpenCV_LIBS})
