@@ -12,7 +12,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include "Blend.hpp"
+#include "blend.hpp"
 
 // -+-+-+-+-+-+-+-+-+-+- //
 //        Utility        //
