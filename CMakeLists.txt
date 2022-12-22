@@ -13,7 +13,7 @@ find_package(Threads REQUIRED)
 # main
 add_compile_definitions(MAX_THREAD=${MAX_THREAD})
 add_executable(main main.cpp)
-target_compile_options(main PUBLIC -O2)
+target_compile_options(main PUBLIC -march=native -O2)
 
 # link
 target_link_libraries(main ${OpenCV_LIBS})
