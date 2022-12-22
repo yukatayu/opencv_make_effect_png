@@ -129,9 +129,9 @@ inline void render(cv::Mat& img, const Status status){
 
 						// 注意： 色はBGRAの順に格納される。
 						col = blend_screen(col, cv::Vec4b(
-							lerp( 84, 133, gradation),
-							lerp( 62, 229, gradation),
-							lerp(221, 107, gradation),
+							lerp_multi({215,215,204,125, 90, 87, 53, 39}, 1-gradation),
+							lerp_multi({220,220,201, 98, 35, 19, 22, 26}, 1-gradation),
+							lerp_multi({219,221,226,231,184,128, 61, 28}, 1-gradation),
 							opacity * 255));
 					}
 				}
