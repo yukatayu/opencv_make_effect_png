@@ -3,10 +3,12 @@
 #include <complex>
 #include <utility>
 #include <cmath>
+#include <initializer_list>
 
 namespace renderer {
+
 // -+-+-+-+-+-+-+-+-+-+- //
-//         Blend         //
+//     Color Utility     //
 // -+-+-+-+-+-+-+-+-+-+- //
 
 inline float saturate(float x){
@@ -15,6 +17,19 @@ inline float saturate(float x){
 
 inline float lerp(float a, float b, float mix){
 	return (b-a) * saturate(mix) + a;
+}
+
+inline float lerp_multi(std::initializer_list<float> fl, float mix){
+	assert(2 <= fl.size());
+	float section_mix = saturate(mix) * (fl.size()-1);
+	int section = section_mix;
+	section_mix -= section;
+
+	if(section < fl.size() - 1){
+		return lerp(*(fl.begin() + section), *(fl.begin() + section+1), section_mix);
+	}else{
+		return *(fl.begin() + (fl.size()-1));
+	}
 }
 
 inline float dot(std::array<float,2> a, std::array<float,2> b){
@@ -37,6 +52,11 @@ inline unsigned char float2byte(float x){
 inline cv::Vec4b invert_color(const cv::Vec4b& col){
 	return cv::Vec4b(255-col[0], 255-col[1], 255-col[2], col[3]);
 }
+
+
+// -+-+-+-+-+-+-+-+-+-+- //
+//         Blend         //
+// -+-+-+-+-+-+-+-+-+-+- //
 
 template<class T>
 inline cv::Vec4b blend_internal(const cv::Vec4b& dst, const cv::Vec4b& src, float Fd, float Fs, T B){
