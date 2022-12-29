@@ -69,7 +69,6 @@ int main(int argc, char *argv[]){
 	std::cout << "duration: "  << status.duration << std::endl;
 	std::cout << "width: "     << status.width    << std::endl;
 	std::cout << "height: "    << status.height   << std::endl;
-	std::cout << "max thread:" <<  MAX_THREAD << std::endl;
 
 	std::atomic_int done_frame_cnt{0};
 	int total_frame_cnt = status.fps * status.duration;
@@ -84,14 +83,6 @@ int main(int argc, char *argv[]){
 	// CPUメモリ確保
 	cv::Mat img = cv::Mat::zeros(cv::Size(status.width, status.height), CV_MAKE_TYPE(CV_8U, 4));
 	
-
-	// debug
-	std::vector<unsigned char> tmp_buf(status.width*status.height*4);
-	for(int i=0; i<5; ++i){
-		img.data[i] = i + 1;
-		tmp_buf[i] = i + 1;
-	}
-
 	// メインループ
 	for(int frame = 0; frame < total_frame_cnt; ++frame){
 		float time = float(frame) / status.fps;
@@ -103,17 +94,8 @@ int main(int argc, char *argv[]){
 			invoke_render<<<1024,1024>>>(device_img_raw, current_status, i*1024*1024);
 		cudaCheck();
 
-		std::cout << reinterpret_cast<long>(img.data) << " <- " << reinterpret_cast<long>(device_img.get()) << " by " << status.width*status.height*4 << std::endl;
 		cudaAssert(cudaMemcpy(img.data, device_img.get(), status.width*status.height*4, cudaMemcpyDeviceToHost));
 		cudaDeviceSynchronize();
-		std::cout << "\ndebug | ";
-		for(int i=0; i<10; ++i){
-			std::cout << int(img.data[i]) <<", ";
-		}std::cout << std::endl;
-		std::cout << "\n      | ";
-		for(int i=0; i<10; ++i){
-			std::cout << int(tmp_buf[i]) <<", ";
-		}std::cout << std::endl;
 
 		std::ostringstream file_name;
 		file_name << "png/out_" << zero_ume(frame) << ".png";

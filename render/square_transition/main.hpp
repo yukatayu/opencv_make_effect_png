@@ -135,11 +135,10 @@ inline void render(cv::Mat& img, const Status status){
 						const float vec_diagonal[2]{ float(width), float(height) }, pos[2]{ float(x), float(y) };
 						float gradation = dot(vec_diagonal, pos) / dot(vec_diagonal, vec_diagonal);
 
-						// 注意： 色はBGRAの順に格納される。
 						RGBA target_col {
-							lerp_multi({215,215,204,125, 90, 87, 53, 39}, 1-gradation),
-							lerp_multi({220,220,201, 98, 35, 19, 22, 26}, 1-gradation),
 							lerp_multi({219,221,226,231,184,128, 61, 28}, 1-gradation),
+							lerp_multi({220,220,201, 98, 35, 19, 22, 26}, 1-gradation),
+							lerp_multi({215,215,204,125, 90, 87, 53, 39}, 1-gradation),
 							(unsigned char)(opacity * 255)
 						};
 						col = util::blend_screen(col, target_col);
@@ -280,11 +279,10 @@ __device__ RGBA render(unsigned char* img, const Status status, int x, int y){
 				const float vec_diagonal[2]{ float(width), float(height) }, pos[2]{ float(x), float(y) };
 				float gradation = dot(vec_diagonal, pos) / dot(vec_diagonal, vec_diagonal);
 
-				// 注意： 色はBGRAの順に格納される。
 				RGBA target_col {
-					lerp_multi({215,215,204,125, 90, 87, 53, 39}, 1-gradation),
-					lerp_multi({220,220,201, 98, 35, 19, 22, 26}, 1-gradation),
 					lerp_multi({219,221,226,231,184,128, 61, 28}, 1-gradation),
+					lerp_multi({220,220,201, 98, 35, 19, 22, 26}, 1-gradation),
+					lerp_multi({215,215,204,125, 90, 87, 53, 39}, 1-gradation),
 					(unsigned char)(opacity * 255)
 				};
 				col = util::blend_screen(col, target_col);
