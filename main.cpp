@@ -1,5 +1,3 @@
-#include <iostream>
-#include <cstdio>
 #include <string>
 #include <iomanip>
 #include <sstream>
@@ -9,54 +7,14 @@
 #include <vector>
 #include <atomic>
 #include <opencv2/opencv.hpp>
-#include <sys/ioctl.h>
-#include <unistd.h>
-
-#include "blend.hpp"
-
-// -+-+-+-+-+-+-+-+-+-+- //
-//        Utility        //
-// -+-+-+-+-+-+-+-+-+-+- //
-
-std::string zero_ume(int i, int width = 6){
-	std::ostringstream ss;
-	ss << std::setfill('0') << std::right << std::setw(width) << i;
-	return ss.str();
-}
-
-void progress_bar(long long int numerator, long long int denominator){
-	struct winsize winsz;
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &winsz);
-	++numerator;
-	std::ostringstream ss;
-	ss << "\e[2K\r |";
-	int max = winsz.ws_col - 20 - 2*std::log10(denominator);
-	for(int i=0; i<max; ++i)
-		ss << (numerator* max >= i * denominator ? "\e[42m" : "\e[41m") << " ";
-	ss << "\e[0m| "
-		<< numerator << " / " << denominator
-		<< " (" << int(double(numerator*100) / denominator) << '%' << ")";
-	std::cerr << ss.str() << std::flush;
-};
+#include "util.hpp"
+#include "protocol.hpp"
 
 
 // -+-+-+-+-+-+-+-+-+-+- //
 //       Main Loop       //
 // -+-+-+-+-+-+-+-+-+-+- //
 
-struct Status {
-	int frame;
-	float fps;
-	float time;
-	float duration;
-	int height;
-	int width;
-};
-
-namespace renderer {
-void init(Status& status);
-void render(cv::Mat& img, const Status status);
-}
 
 int main(int argc, char *argv[]){
 	const float fps_      = (argc > 1 ? std::stof(argv[1]) :   30);  // デフォルト: 30 fps
@@ -64,7 +22,7 @@ int main(int argc, char *argv[]){
 	const int   height_   = (argc > 3 ? std::stoi(argv[3]) : 1080);  // デフォルト: 1080 px
 
 	Status status{ 0, fps_, 0, 0, height_, width_ };
-	renderer::init(status);
+	renderer_cpu::init(status);
 
 	std::cout << "fps: "       << status.fps      << std::endl;
 	std::cout << "duration: "  << status.duration << std::endl;
@@ -86,7 +44,7 @@ int main(int argc, char *argv[]){
 				Status current_status = status;
 				current_status.frame = frame;
 				current_status.time  = time;
-				renderer::render(img, current_status);
+				renderer_cpu::render(img, current_status);
 
 				std::ostringstream file_name;
 				file_name << "png/out_" << zero_ume(frame) << ".png";
@@ -107,4 +65,4 @@ int main(int argc, char *argv[]){
 //        Include        //
 // -+-+-+-+-+-+-+-+-+-+- //
 
-#include "render/square_transition.hpp"
+#include "main.hpp"

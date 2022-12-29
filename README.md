@@ -3,6 +3,11 @@
 - CUDA
   - https://docs.nvidia.com/cuda/wsl-user-guide/index.html
 
+```bash
+sudo apt install nvidia-cuda-toolkit
+ln -s $(which gcc-8) /usr/local/bin/gcc
+ln -s $(which g++-8) /usr/local/bin/g++
+```
 
 ## Build
 
